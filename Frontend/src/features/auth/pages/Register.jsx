@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../hook/useAuth";
 import snitchDenimHero from "../../../assets/snitch_denim_hero.png";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Register() {
   const { handleRegister, loading, error } = useAuth();
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -86,6 +88,7 @@ export default function Register() {
 
     if (result && result.success) {
       setIsSuccess(true);
+      navigate("/");
     }
   };
 
@@ -111,7 +114,7 @@ export default function Register() {
             {/* Content overlay on the image */}
             <div className="absolute bottom-8 left-5 right-5 text-left z-20">
               <p className="text-xs tracking-widest uppercase text-white/40 mb-1 font-semibold">Snitch</p>
-              <p className="text-sm text-white/70 font-medium tracking-wide">Join the curation.</p>
+              <p className="text-sm text-white/70 font-medium tracking-wide">Elevate Your Style.</p>
             </div>
           </div>
         </div>
@@ -130,7 +133,7 @@ export default function Register() {
                 Welcome to Snitch. Your registration was successful and you are now logged in.
               </p>
               <button 
-                onClick={() => window.location.reload()} 
+                onClick={() => navigate("/")} 
                 className="px-6 py-2.5 bg-[#8B5CF6] hover:bg-[#7C3AED] active:scale-95 transition-all text-white font-medium rounded-full text-sm shadow-lg shadow-purple-900/30"
               >
                 Go to Dashboard
@@ -143,9 +146,9 @@ export default function Register() {
                 <h2 className="text-[32px] font-bold text-white tracking-tight mb-2 font-display">Create an account</h2>
                 <p className="text-sm text-[#958EA0]">
                   Already have an account?{" "}
-                  <a href="#login" className="text-[#DDD6FE] hover:text-[#C8C2E9] font-medium transition-colors hover:underline">
+                  <Link to="/login" className="text-[#DDD6FE] hover:text-[#C8C2E9] font-medium transition-colors hover:underline">
                     Log in
-                  </a>
+                  </Link>
                 </p>
               </div>
 

@@ -55,3 +55,22 @@ export const register = async (req,res) =>{
         return res.status(500).json({success:false,message:"Server error"})
     }
 }
+
+export const login = async (req,res) =>{
+    const {email, password} = req.body;
+
+    try{
+        const user = await userModel.findOne({email}).select("+password");
+        if(!user){
+            return res.status(400).json({success:false,message:"User not found"})
+        }
+        const isMatch = await user.comparePassword(password);
+        if(!isMatch){
+            return res.status(400).json({success:false,message:"Invalid credentials"})
+        }
+        await sendTokenResponse(user,res,"User logged in successfully")
+    }catch(error){
+        console.log(error)
+        return res.status(500).json({success:false,message:"Server error"})
+    }
+}
