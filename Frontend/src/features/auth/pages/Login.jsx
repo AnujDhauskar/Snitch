@@ -227,6 +227,7 @@ export default function Login() {
           <div className="grid grid-cols-2 gap-4">
             <button
               type="button"
+              onClick={() => window.location.href = "/api/auth/google"}
               className="border border-[#DDD6FE]/10 hover:border-[#DDD6FE]/30 hover:bg-[#DDD6FE]/5 text-[#E5E1E4] py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.98] flex items-center justify-center gap-2.5"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">

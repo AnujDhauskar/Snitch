@@ -364,10 +364,11 @@ export default function Register() {
               {/* Social Buttons */}
               <div className="grid grid-cols-2 gap-4">
                 <button
+                  onClick={() => window.location.href = "/api/auth/google"}
                   type="button"
                   className="border border-[#DDD6FE]/10 hover:border-[#DDD6FE]/30 hover:bg-[#DDD6FE]/5 text-[#E5E1E4] py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.98] flex items-center justify-center gap-2.5"
                 >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24"> 
                     <path
                       fill="#EA4335"
                       d="M12.24 10.285V14.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.859-3.579-7.859-8s3.53-8 7.859-8c2.46 0 4.105 1.025 5.047 1.926l3.25-3.125C18.29 1.21 15.52.5 12.24.5c-6.35 0-11.5 5.15-11.5 11.5s5.15 11.5 11.5 11.5c6.63 0 11.04-4.66 11.04-11.2 0-.75-.08-1.325-.2-1.815H12.24z"
