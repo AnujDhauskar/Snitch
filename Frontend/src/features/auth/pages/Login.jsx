@@ -224,25 +224,28 @@ export default function Login() {
           </div>
 
           {/* Social Buttons */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-3">
             <button
               type="button"
               onClick={() => window.location.href = "/api/auth/google"}
-              className="border border-[#DDD6FE]/10 hover:border-[#DDD6FE]/30 hover:bg-[#DDD6FE]/5 text-[#E5E1E4] py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.98] flex items-center justify-center gap-2.5"
+              className="bg-[#131314] border border-[#8E918F] hover:bg-[#1E1E1E] text-[#E3E3E3] py-2.5 px-4 rounded-xl text-sm font-medium transition-all active:scale-[0.98] flex items-center justify-center gap-3 w-full"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24">
-                <path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.859-3.579-7.859-8s3.53-8 7.859-8c2.46 0 4.105 1.025 5.047 1.926l3.25-3.125C18.29 1.21 15.52.5 12.24.5c-6.35 0-11.5 5.15-11.5 11.5s5.15 11.5 11.5 11.5c6.63 0 11.04-4.66 11.04-11.2 0-.75-.08-1.325-.2-1.815H12.24z" />
+              <svg className="w-5 h-5 shrink-0" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.7 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
               </svg>
-              Google
+              Continue with Google
             </button>
             <button
               type="button"
-              className="border border-[#DDD6FE]/10 hover:border-[#DDD6FE]/30 hover:bg-[#DDD6FE]/5 text-[#E5E1E4] py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.98] flex items-center justify-center gap-2.5"
+              className="bg-[#121214] border border-[#DDD6FE]/10 hover:border-[#DDD6FE]/30 hover:bg-[#DDD6FE]/5 text-[#E5E1E4] py-2.5 px-4 rounded-xl text-sm font-medium transition-all active:scale-[0.98] flex items-center justify-center gap-3 w-full"
             >
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-.96.04-2.13.64-2.82 1.45-.6.68-1.12 1.82-.98 2.92.1.08.2.12.3.12.87 0 1.96-.53 2.51-1.43z" />
               </svg>
-              Apple
+              Continue with Apple
             </button>
           </div>
 
