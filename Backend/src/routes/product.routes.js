@@ -18,6 +18,7 @@ const router = express.Router();
  */
 router.post("/", authenticateSeller,upload.array("images", 7),createProductValidator,createProduct);
 
+
 /**
  * @route GET api/products/
  * @description Get all products of the authenticate seller

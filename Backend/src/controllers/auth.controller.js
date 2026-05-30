@@ -118,26 +118,16 @@ export const googleLoginCallback = async (req, res) => {
 }
 
 export const getMe = async (req, res) => {
-    try {
-        const token = req.cookies?.token;
-        if (!token) return res.status(401).json({ success: false, message: "Not authenticated" });
-
-        const decoded = jwt.verify(token, config.JWT_SECRET);
-        const user = await userModel.findById(decoded.id).select("-password");
-        if (!user) return res.status(401).json({ success: false, message: "User not found" });
-
-        res.status(200).json({
-            success: true,
-            user: {
-                id: user._id,
-                email: user.email,
-                contact: user.contact,
-                fullname: user.fullname,
-                avatar: user.avatar,
-                role: user.role,
-            }
-        });
-    } catch (error) {
-        res.status(401).json({ success: false, message: "Invalid token" });
-    }
+   const user = req.user;
+    res.status(200).json({
+        message:"user Fetched successfully",
+        success:true,
+        user : {
+             id:user._id,
+             email:user.email,
+             fullname:user.fullname,
+             contact:user.contact,
+             role:user.role,
+        }
+    })
 }
