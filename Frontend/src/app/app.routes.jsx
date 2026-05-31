@@ -4,12 +4,12 @@ import Login from "../features/auth/pages/Login";
 import Dashboard from "../features/products/pages/Dashboard";
 import CreateProduct from "../features/products/pages/CreateProduct";
 import Protected from "../features/components/Protected";
-import BuyerDashboard from "../features/auth/components/BuyerDashboard";
+import Home from "../features/products/pages/Home";
 
 export const routes = createBrowserRouter([
     {
         path: "/",
-        element: <BuyerDashboard />
+        element: <Home/>
     },
     {
         path: "/register",
