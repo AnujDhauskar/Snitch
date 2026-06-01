@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useProduct } from '../hook/useproduct'
+import { useNavigate } from 'react-router'
 
 const Home = () => {
     const products = useSelector(state => state.product.products);
     const { handleGetAllProducts } = useProduct();
     const [activeCategory, setActiveCategory] = useState('All');
     const [moreOpen, setMoreOpen] = useState(false);
+    const navigate = useNavigate(); 
 
     const mainCategories = ['All', 'Shirts', 'T-Shirts', 'Jeans', 'Cargo', 'Trousers'];
     const moreCategories = ['Jackets', 'Hoodies', 'Shorts', 'Kurtas', 'Ethnic Wear', 'Accessories'];
@@ -34,8 +36,25 @@ const Home = () => {
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         position: 'sticky', top: 0, zIndex: 50,
       }}>
-        <div style={{ fontSize: '1.3rem', fontWeight: '800', letterSpacing: '0.2em', color: '#fff', textTransform: 'uppercase', fontFamily: 'serif' }}>
-          SNITCH
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', opacity: 0.92, transition: 'opacity 0.2s' }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '0.92'}
+        >
+          {/* Hashtag grid symbol */}
+          <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Horizontal bars */}
+            <rect x="8" y="30" width="84" height="12" rx="6" fill="white"/>
+            <rect x="8" y="58" width="84" height="12" rx="6" fill="white"/>
+            {/* Vertical bars */}
+            <rect x="30" y="8" width="12" height="84" rx="6" fill="white"/>
+            <rect x="58" y="8" width="12" height="84" rx="6" fill="white"/>
+          </svg>
+          {/* SNITCH text */}
+          <span style={{
+            fontSize: '1.15rem', fontWeight: '900', letterSpacing: '0.18em',
+            color: '#ffffff', textTransform: 'uppercase', fontFamily: 'serif',
+            lineHeight: 1,
+          }}>SNITCH</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
@@ -65,6 +84,7 @@ const Home = () => {
             onMouseLeave={e => { e.currentTarget.style.background = '#8B5CF6'; e.currentTarget.style.boxShadow = '0 0 20px rgba(139,92,246,0.3)'; }}>
             Shop Now
           </button>
+
         </div>
       </nav>
 
@@ -256,7 +276,7 @@ const Home = () => {
         </div>
 
         {/* Right headline */}
-        <div style={{ position: 'absolute', right: '4rem', top: '35%', zIndex: 10, textAlign: 'right' }}>
+        <div style={{ position: 'absolute', right: '0.5rem', top: '35%', zIndex: 10, textAlign: 'right' }}>
           <h1 style={{ fontSize: 'clamp(4rem, 8vw, 9rem)', lineHeight: '0.85', fontFamily: 'serif', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '-0.02em', color: '#fff' }}>
             <span style={{ display: 'block' }}>Looks</span>
             <span style={{ display: 'block', backgroundImage: 'linear-gradient(135deg, #DDD6FE, #8B5CF6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Awaits</span>
@@ -352,6 +372,7 @@ const Home = () => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
             {products.map((product, index) => (
               <div
+                onClick={() => navigate(`/product/${product._id}`)} 
                 key={product._id}
                 style={{
                   background: '#121214', border: '1px solid rgba(255,255,255,0.06)',
