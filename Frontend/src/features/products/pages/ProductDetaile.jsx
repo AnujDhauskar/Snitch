@@ -7,6 +7,7 @@ const ProductDetaile = () => {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
   const [activeImg, setActiveImg] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
   const { handleGetProductById } = useProduct();
@@ -19,8 +20,6 @@ const ProductDetaile = () => {
   useEffect(() => {
     fetchProductDetails();
   }, [productId]);
-
-  const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
   const handleAddToCart = () => {
     setAddedToCart(true);
@@ -40,13 +39,90 @@ const ProductDetaile = () => {
       },
     ],
     createdAt: '2026-05-31T10:55:23.674Z',
+    varients: []
   };
 
-  const images = displayProduct.images && displayProduct.images.length > 0
-    ? displayProduct.images
-    : [{ url: 'https://ik.imagekit.io/xfgbpm21y/snitch/mahdi-bafande-npyWFYpHQ94-unsplash_A6fxKVb_R.jpg', _id: 'fallback' }];
+  const variants = displayProduct.varients || [];
 
-  const currencySymbol = displayProduct.price?.currency === 'INR' ? '₹' : (displayProduct.price?.currency || '$');
+  // Case-insensitive attribute getter — Mongoose Maps can serialize keys with any casing
+  const getAttr = (attributes, key) => {
+    if (!attributes) return undefined;
+    const lowerKey = key.toLowerCase();
+    const foundKey = Object.keys(attributes).find(k => k.toLowerCase() === lowerKey);
+    return foundKey ? attributes[foundKey] : undefined;
+  };
+
+  const availableSizes = [...new Set(variants.map(v => getAttr(v.attributes, 'size')).filter(Boolean))];
+  let colors = [...new Set(variants.map(v => getAttr(v.attributes, 'color')).filter(Boolean))];
+
+  const titleLower = (displayProduct.title || '').toLowerCase();
+  const knownColors = ['black', 'white', 'red', 'blue', 'green', 'yellow', 'navy', 'grey', 'gray', 'maroon', 'pink', 'purple', 'brown', 'olive', 'teal', 'mustard'];
+  const inferredBaseColor = knownColors.find(c => titleLower.includes(c));
+
+  if (inferredBaseColor && !colors.some(c => c.toLowerCase() === inferredBaseColor)) {
+    const capitalizedColor = inferredBaseColor.charAt(0).toUpperCase() + inferredBaseColor.slice(1);
+    colors.unshift(capitalizedColor);
+  }
+
+  // Compute available sizes based on the currently selected color
+  let sizesForSelectedColor = [];
+  if (selectedColor) {
+    const variantsWithColor = variants.filter(v => {
+      const vColor = getAttr(v.attributes, 'color');
+      return vColor && vColor.toLowerCase() === selectedColor.toLowerCase();
+    });
+    
+    if (variantsWithColor.length > 0) {
+      sizesForSelectedColor = variantsWithColor.map(v => getAttr(v.attributes, 'size')).filter(Boolean);
+    } else if (inferredBaseColor && selectedColor.toLowerCase() === inferredBaseColor.toLowerCase()) {
+      sizesForSelectedColor = ['XL']; // Default for the base inferred product
+    }
+  }
+
+  const sizes = sizesForSelectedColor.length > 0 
+    ? [...new Set(sizesForSelectedColor)] 
+    : [...new Set([...availableSizes, 'L', 'XL'])];
+
+  // Auto-select color once variants are loaded
+  useEffect(() => {
+    if (colors.length > 0 && !selectedColor) {
+      setSelectedColor(colors[0]);
+    }
+  }, [product, colors, selectedColor]);
+
+  // Auto-update selected size when available sizes for the selected color change
+  useEffect(() => {
+    if (sizes.length > 0 && (!selectedSize || !sizes.includes(selectedSize))) {
+      setSelectedSize(sizes[0]);
+    }
+  }, [sizes, selectedSize]);
+
+  // Find variant matching both size and color (if colors exist), else just size
+  const selectedVariant = variants.find(v => {
+    const vSize = getAttr(v.attributes, 'size');
+    const vColor = getAttr(v.attributes, 'color');
+    const sizeMatch = !selectedSize || vSize === selectedSize;
+    const colorMatch = colors.length === 0 || !selectedColor || vColor === selectedColor;
+    return sizeMatch && colorMatch;
+  });
+
+  // Find a variant that matches the selected color, regardless of size, to guarantee the correct color image
+  const colorVariant = variants.find(v => {
+    const vColor = getAttr(v.attributes, 'color');
+    return vColor && selectedColor && vColor.toLowerCase() === selectedColor.toLowerCase();
+  });
+
+  // Use selected variant image, OR color-matched variant image, OR fallback to base product image
+  const variantImages = selectedVariant?.images?.length > 0 ? selectedVariant.images : [];
+  const colorImages = colorVariant?.images?.length > 0 ? colorVariant.images : [];
+  const productImages = displayProduct.images?.length > 0 ? displayProduct.images : [];
+  
+  const images = variantImages.length > 0 ? variantImages 
+    : (colorImages.length > 0 ? colorImages 
+    : (productImages.length > 0 ? productImages : [{ url: 'https://ik.imagekit.io/xfgbpm21y/snitch/mahdi-bafande-npyWFYpHQ94-unsplash_A6fxKVb_R.jpg', _id: 'fallback' }]));
+
+  const displayPrice = selectedVariant?.price?.amount || displayProduct.price?.amount || 0;
+  const currencySymbol = selectedVariant?.price?.currency === 'INR' ? '₹' : (displayProduct.price?.currency === 'INR' ? '₹' : '$');
 
   return (
     <div className="min-h-screen font-sans" style={{ background: '#09090B', color: '#E5E1E4' }}>
@@ -272,10 +348,10 @@ const ProductDetaile = () => {
                   className="font-bold"
                   style={{ fontSize: '2.4rem', color: '#8B5CF6', fontFamily: 'serif', letterSpacing: '-0.02em' }}
                 >
-                  {currencySymbol}{displayProduct.price?.amount?.toLocaleString('en-IN')}
+                  {currencySymbol}{displayPrice.toLocaleString('en-IN')}
                 </span>
                 <span style={{ fontSize: '1rem', color: '#494454', textDecoration: 'line-through' }}>
-                  {currencySymbol}{Math.round((displayProduct.price?.amount || 0) * 1.3).toLocaleString('en-IN')}
+                  {currencySymbol}{Math.round(displayPrice * 1.3).toLocaleString('en-IN')}
                 </span>
                 <span
                   className="font-semibold text-xs uppercase tracking-wider rounded-full px-3 py-1"
@@ -296,6 +372,54 @@ const ProductDetaile = () => {
                     : 'A timeless piece crafted for the modern wardrobe. Clean silhouette, premium fabric, effortless versatility — from morning to night.'}
                 </p>
               </div>
+
+              {/* Color Selector */}
+              {colors.length > 0 && (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <span style={{ fontSize: '0.72rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#958EA0', fontWeight: '600' }}>
+                    Select Color
+                  </span>
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  {colors.map(color => {
+                    const isSelected = selectedColor === color;
+                    // Try to use the color name as a CSS color for the swatch dot
+                    const swatchStyle = { width: '12px', height: '12px', borderRadius: '50%', background: color.toLowerCase(), border: '1px solid rgba(255,255,255,0.2)', flexShrink: 0 };
+                    return (
+                    <button
+                      key={color}
+                      onClick={() => { setSelectedColor(color); setActiveImg(0); }}
+                      className="flex items-center gap-2 rounded-xl font-semibold transition-all duration-200 px-4 py-2"
+                      style={{
+                        fontSize: '0.8rem', letterSpacing: '0.05em',
+                        border: isSelected ? '2px solid #8B5CF6' : '1px solid rgba(255,255,255,0.08)',
+                        background: isSelected ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.03)',
+                        color: isSelected ? '#DDD6FE' : '#958EA0',
+                        boxShadow: isSelected ? '0 0 16px rgba(139,92,246,0.25)' : 'none',
+                        cursor: 'pointer',
+                      }}
+                      onMouseEnter={e => {
+                        if (!isSelected) {
+                          e.currentTarget.style.borderColor = 'rgba(139,92,246,0.4)';
+                          e.currentTarget.style.color = '#E5E1E4';
+                        }
+                      }}
+                      onMouseLeave={e => {
+                        if (!isSelected) {
+                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                          e.currentTarget.style.color = '#958EA0';
+                        }
+                      }}
+                    >
+                      <span style={swatchStyle} />
+                      {color}
+                    </button>
+                    );
+                  })}
+                </div>
+              </div>
+              )}
 
               {/* Size Selector */}
               <div className="flex flex-col gap-3">

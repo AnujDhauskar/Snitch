@@ -25,3 +25,8 @@ export const createProductValidator = [
 
     validateRequest
 ]
+
+export const addVariantValidator = [
+    body("priceAmount").notEmpty().withMessage("Price amount is required"),
+    validateRequest
+]

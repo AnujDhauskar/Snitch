@@ -1,8 +1,8 @@
 import express from "express";
 import { authenticateSeller } from "../middlewares/auth.midleware.js";
-import { createProduct,getSellerProducts,getAllProducts , getProductsDetails} from "../controllers/product.controller.js";
+import { createProduct,getSellerProducts,getAllProducts , getProductsDetails, addProductVarient, updateProduct} from "../controllers/product.controller.js";
 import multer from "multer";
-import { createProductValidator } from "../validators/product.validator.js";
+import { createProductValidator, addVariantValidator } from "../validators/product.validator.js";
 
 const upload = multer({ storage: multer.memoryStorage(),
     limits:{
@@ -42,6 +42,22 @@ router.get("/",getAllProducts)
  */
 
 router.get("/detail/:id",getProductsDetails)
+
+/**
+ * @route post/api/products/:productId/varients
+ * @description add new varient to the product
+ * @access Private (Seller)
+ */
+
+router.post("/:productId/varients",authenticateSeller,upload.array('images',7),addVariantValidator,addProductVarient)
+
+/**
+ * @route PUT api/products/:id
+ * @description Update product details including variants
+ * @access Private (Seller)
+ */
+// Added route to handle updating product details and variants
+router.put("/:id", authenticateSeller, upload.single("mainImage"), updateProduct);
 
 
 export default router;

@@ -2,10 +2,12 @@ import { useEffect } from 'react';
 import { useProduct } from '../hook/useproduct';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
     const { handleGetSellerProduct } = useProduct();
     const sellerProducts = useSelector(state => state.product.sellerProduct) || [];
+    const navigate = useNavigate();
 
     useEffect(() => {
         handleGetSellerProduct();
@@ -100,7 +102,7 @@ const Dashboard = () => {
                                     <span className="text-purple-400 font-medium">All Products</span>
                                 </div>
                             </div>
-                            <Link to="/create-product" className="px-6 py-2.5 bg-white text-black hover:bg-gray-200 rounded-full font-semibold transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] flex items-center gap-2 text-sm">
+                            <Link to="/seller/create-products" className="px-6 py-2.5 bg-white text-black hover:bg-gray-200 rounded-full font-semibold transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] flex items-center gap-2 text-sm">
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/></svg>
                                 Add new product
                             </Link>
@@ -140,7 +142,9 @@ const Dashboard = () => {
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
                                     {sellerProducts.map((product) => (
-                                        <div key={product._id} className="group bg-black/40 border border-white/5 rounded-2xl overflow-hidden hover:border-purple-500/30 transition-all duration-300 flex flex-col">
+                                        <div
+                                        onClick={()=>{navigate(`/seller/product/${product._id}`)}}
+                                         key={product._id} className="group bg-black/40 border border-white/5 rounded-2xl overflow-hidden hover:border-purple-500/30 transition-all duration-300 flex flex-col">
                                             {/* Product Image */}
                                             <div className="aspect-[4/3] w-full relative overflow-hidden bg-white/5 p-4 flex items-center justify-center">
                                                 {product.images && product.images.length > 0 ? (
