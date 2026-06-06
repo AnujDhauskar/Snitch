@@ -13,6 +13,13 @@ const CartRouter = express.Router();
  */
 
 CartRouter.post('/add/:productId/:varientId',authenticateUser, validateAddToCart,addToCart);
+
+/**
+ * @route GET/api/cart
+ * @description Get Cart
+ * @access Private
+ */
+
 CartRouter.get("/",authenticateUser,getCart)
 
 export default CartRouter;
