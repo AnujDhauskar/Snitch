@@ -98,8 +98,8 @@ const ProductDetaile = () => {
   const selectedVariant = variants.find(v => {
     const vSize = getAttr(v.attributes, 'size');
     const vColor = getAttr(v.attributes, 'color');
-    const sizeMatch = !selectedSize || vSize === selectedSize;
-    const colorMatch = colors.length === 0 || !selectedColor || vColor === selectedColor;
+    const sizeMatch = !selectedSize || (vSize && vSize.toLowerCase() === selectedSize.toLowerCase());
+    const colorMatch = colors.length === 0 || !selectedColor || (vColor && vColor.toLowerCase() === selectedColor.toLowerCase());
     return sizeMatch && colorMatch;
   });
 
@@ -528,12 +528,22 @@ const ProductDetaile = () => {
                     }
                   }}
 
-                  onClick = {()=>{
-                    handleAddItem({
-                      productId:product._id,
-                      varientId:selectedVariant._id
-
-                    })
+                  onClick={async () => {
+                    if (!selectedVariant) {
+                      alert("This size and color combination is currently unavailable.");
+                      return;
+                    }
+                    try {
+                      await handleAddItem({
+                        productId: displayProduct._id,
+                        varientId: selectedVariant._id
+                      });
+                      setAddedToCart(true);
+                      setTimeout(() => setAddedToCart(false), 2000);
+                    } catch (err) {
+                      console.error("Error adding to cart:", err);
+                      alert("Failed to add item to cart.");
+                    }
                   }}
 
                 >
