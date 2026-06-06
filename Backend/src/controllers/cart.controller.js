@@ -4,6 +4,7 @@ import { stockOfVarient } from "../dao/product.dao.js";
 
 export const addToCart = async (req,res)=> {
     const { productId, varientId } = req.params
+    const quantity = req.body.quantity || 1;
     const product = await productModel.findOne({
         _id:productId,
         "varients._id":varientId
@@ -21,16 +22,16 @@ export const addToCart = async (req,res)=> {
 
     const cart = (await cartModel.findOne({ user:req.user._id })) || await cartModel.create({user:req.user._id})
     const isProductAlreadyInCart = cart.items.some((item)=>{
-        item.product.toString() === product._id.toString() &&
+        return item.product.toString() === product._id.toString() &&
         item.variant?.toString() === varientId
     })
 
     if(isProductAlreadyInCart){
-        const quantityInCart = cart.items.find(item=> item.product.toString() === productId && item.variant?.toString() === varientId)
-        if(quantityInCart + quantity > stock){
+        const cartItem = cart.items.find(item=> item.product.toString() === productId && item.variant?.toString() === varientId)
+        if(cartItem.quantity + quantity > stock){
             return res.status(400).json({
                 success:false,
-                message:`only ${stock-quantityInCart} items left in stock and you already have ${quantityInCart} items in cart`
+                message:`only ${stock-cartItem.quantity} items left in stock and you already have ${cartItem.quantity} items in cart`
             })
         }
 

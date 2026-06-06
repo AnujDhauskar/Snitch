@@ -10,7 +10,7 @@ const validateRequest= (req,res,next) => {
 
 export const validateAddToCart = [
     param('productId').notEmpty().isMongoId().withMessage("Please enter a valid product id"),
-    param('variantId').notEmpty().isMongoId().withMessage("Please enter a valid variant id"),
+    param('varientId').notEmpty().isMongoId().withMessage("Please enter a valid variant id"),
     body('quantity').optional().isInt({min:1}).withMessage("Quantity must be at least 1"),
     validateRequest
 ]

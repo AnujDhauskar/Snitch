@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router'
 import { useProduct } from '../hook/useproduct';
+import { useCart } from '../../cart/hook/useCart';
 
 const ProductDetaile = () => {
   const { productId } = useParams();
@@ -11,6 +12,7 @@ const ProductDetaile = () => {
   const [activeImg, setActiveImg] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
   const { handleGetProductById } = useProduct();
+  const {handleAddItem} = useCart();
 
   async function fetchProductDetails() {
     const data = await handleGetProductById(productId);
@@ -20,11 +22,6 @@ const ProductDetaile = () => {
   useEffect(() => {
     fetchProductDetails();
   }, [productId]);
-
-  const handleAddToCart = () => {
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2000);
-  };
 
   // Fallback product data if API hasn't returned yet
   const displayProduct = product || {
@@ -502,7 +499,7 @@ const ProductDetaile = () => {
                 {/* Add to Cart */}
                 <button
                   id="add-to-cart-btn"
-                  onClick={handleAddToCart}
+                 
                   className="flex-1 flex items-center justify-center gap-2 font-semibold uppercase tracking-wider rounded-2xl transition-all duration-200"
                   style={{
                     background: addedToCart ? 'rgba(139,92,246,0.18)' : 'rgba(255,255,255,0.04)',
@@ -530,6 +527,15 @@ const ProductDetaile = () => {
                       e.currentTarget.style.transform = 'translateY(0)';
                     }
                   }}
+
+                  onClick = {()=>{
+                    handleAddItem({
+                      productId:product._id,
+                      varientId:selectedVariant._id
+
+                    })
+                  }}
+
                 >
                   {addedToCart ? (
                     <>
