@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router'
+import { useParams, useNavigate } from 'react-router';
+import { useSelector } from 'react-redux';
 import { useProduct } from '../hook/useproduct';
 import { useCart } from '../../cart/hook/useCart';
 
@@ -12,7 +13,12 @@ const ProductDetaile = () => {
   const [activeImg, setActiveImg] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
   const { handleGetProductById } = useProduct();
-  const {handleAddItem} = useCart();
+  const {handleAddItem, handleGetCart} = useCart();
+  const cartItems = useSelector(state => state.cart?.items || []);
+
+  useEffect(() => {
+    handleGetCart();
+  }, []);
 
   async function fetchProductDetails() {
     const data = await handleGetProductById(productId);
@@ -497,23 +503,21 @@ const ProductDetaile = () => {
                   Buy Now
                 </button>
 
-                {/* Add to Cart */}
                 <button
                   id="add-to-cart-btn"
-                 
                   className="flex-1 flex items-center justify-center gap-2 font-semibold uppercase tracking-wider rounded-2xl transition-all duration-200"
                   style={{
-                    background: addedToCart ? 'rgba(139,92,246,0.18)' : 'rgba(255,255,255,0.04)',
-                    border: addedToCart ? '2px solid #8B5CF6' : '1px solid rgba(255,255,255,0.1)',
-                    color: addedToCart ? '#DDD6FE' : '#E5E1E4',
+                    background: (addedToCart || cartItems.some(i => i.product?._id === displayProduct?._id && i.variant === selectedVariant?._id)) ? 'rgba(139,92,246,0.18)' : 'rgba(255,255,255,0.04)',
+                    border: (addedToCart || cartItems.some(i => i.product?._id === displayProduct?._id && i.variant === selectedVariant?._id)) ? '2px solid #8B5CF6' : '1px solid rgba(255,255,255,0.1)',
+                    color: (addedToCart || cartItems.some(i => i.product?._id === displayProduct?._id && i.variant === selectedVariant?._id)) ? '#DDD6FE' : '#E5E1E4',
                     padding: '16px 28px',
                     fontSize: '0.8rem',
                     letterSpacing: '0.12em',
                     cursor: 'pointer',
-                    boxShadow: addedToCart ? '0 0 20px rgba(139,92,246,0.2)' : 'none',
+                    boxShadow: (addedToCart || cartItems.some(i => i.product?._id === displayProduct?._id && i.variant === selectedVariant?._id)) ? '0 0 20px rgba(139,92,246,0.2)' : 'none',
                   }}
                   onMouseEnter={e => {
-                    if (!addedToCart) {
+                    if (!(addedToCart || cartItems.some(i => i.product?._id === displayProduct?._id && i.variant === selectedVariant?._id))) {
                       e.currentTarget.style.borderColor = 'rgba(139,92,246,0.5)';
                       e.currentTarget.style.color = '#DDD6FE';
                       e.currentTarget.style.background = 'rgba(139,92,246,0.08)';
@@ -521,7 +525,7 @@ const ProductDetaile = () => {
                     }
                   }}
                   onMouseLeave={e => {
-                    if (!addedToCart) {
+                    if (!(addedToCart || cartItems.some(i => i.product?._id === displayProduct?._id && i.variant === selectedVariant?._id))) {
                       e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
                       e.currentTarget.style.color = '#E5E1E4';
                       e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
@@ -534,13 +538,17 @@ const ProductDetaile = () => {
                       alert("This size and color combination is currently unavailable.");
                       return;
                     }
+                    if (cartItems.some(i => i.product?._id === displayProduct?._id && i.variant === selectedVariant?._id)) {
+                      navigate('/cart');
+                      return;
+                    }
                     try {
                       await handleAddItem({
                         productId: displayProduct._id,
                         varientId: selectedVariant._id
                       });
                       setAddedToCart(true);
-                      setTimeout(() => setAddedToCart(false), 2000);
+                      handleGetCart();
                     } catch (err) {
                       console.error("Error adding to cart:", err);
                       alert("Failed to add item to cart.");
@@ -548,12 +556,12 @@ const ProductDetaile = () => {
                   }}
 
                 >
-                  {addedToCart ? (
+                  {(addedToCart || cartItems.some(i => i.product?._id === displayProduct?._id && i.variant === selectedVariant?._id)) ? (
                     <>
                       <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      Added!
+                      Go to Cart
                     </>
                   ) : (
                     <>
