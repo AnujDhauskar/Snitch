@@ -179,6 +179,7 @@ const ProductDetaile = () => {
 
           {/* Cart */}
           <button
+            onClick={() => navigate('/cart')}
             className="flex items-center p-2 rounded-xl transition-all duration-200"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#958EA0' }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(139,92,246,0.5)'; e.currentTarget.style.color = '#fff'; }}

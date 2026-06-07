@@ -66,7 +66,7 @@ const Home = () => {
           </button>
 
           {/* Cart */}
-          <button style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '8px 10px', color: '#958EA0', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center' }}
+          <button onClick={() => navigate('/cart')} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '8px 10px', color: '#958EA0', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center' }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(139,92,246,0.5)'; e.currentTarget.style.color = '#fff'; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = '#958EA0'; }}>
             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>

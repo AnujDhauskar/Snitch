@@ -1,7 +1,7 @@
 import express from 'express';
 import {authenticateUser} from "../middlewares/auth.midleware.js";
 import { validateAddToCart } from '../validators/cart.validator.js';
-import { addToCart,getCart } from '../controllers/cart.controller.js';
+import { addToCart,getCart, removeItemFromCart, updateCartItemQuantity } from '../controllers/cart.controller.js';
 
 const CartRouter = express.Router();    
 
@@ -21,5 +21,19 @@ CartRouter.post('/add/:productId/:varientId',authenticateUser, validateAddToCart
  */
 
 CartRouter.get("/",authenticateUser,getCart)
+
+/**
+ * @route DELETE /api/cart/remove/:productId/:varientId
+ * @description Remove Product/varient from cart
+ * @access Private
+ */
+CartRouter.delete('/remove/:productId/:varientId', authenticateUser, removeItemFromCart);
+
+/**
+ * @route PUT /api/cart/update/:productId/:varientId
+ * @description Update cart item quantity
+ * @access Private
+ */
+CartRouter.put('/update/:productId/:varientId', authenticateUser, updateCartItemQuantity);
 
 export default CartRouter;

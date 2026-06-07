@@ -90,3 +90,60 @@ export const getCart = async(req,res) => {
         return res.status(500).json({ success: false, message: error.message, error: error.toString() });
     }
 }
+
+export const removeItemFromCart = async (req, res) => {
+    try {
+        const { productId, varientId } = req.params;
+        const cart = await cartModel.findOneAndUpdate(
+            { user: req.user._id },
+            { $pull: { items: { product: productId, variant: varientId } } },
+            { new: true }
+        );
+
+        if (!cart) {
+            return res.status(404).json({ success: false, message: "Cart not found" });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Item removed from cart"
+        });
+    } catch (error) {
+        console.error("Error in removeItemFromCart:", error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const updateCartItemQuantity = async (req, res) => {
+    try {
+        const { productId, varientId } = req.params;
+        const { quantity } = req.body;
+
+        if (quantity <= 0) {
+            return res.status(400).json({ success: false, message: "Quantity must be at least 1" });
+        }
+
+        const stock = await stockOfVarient(productId, varientId);
+        if (quantity > stock) {
+            return res.status(400).json({ success: false, message: `Only ${stock} items left in stock` });
+        }
+
+        const cart = await cartModel.findOneAndUpdate(
+            { user: req.user._id, "items.product": productId, "items.variant": varientId },
+            { $set: { "items.$.quantity": quantity } },
+            { new: true }
+        );
+
+        if (!cart) {
+            return res.status(404).json({ success: false, message: "Item not found in cart" });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Item quantity updated"
+        });
+    } catch (error) {
+        console.error("Error in updateCartItemQuantity:", error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
