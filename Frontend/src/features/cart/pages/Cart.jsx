@@ -12,6 +12,9 @@ const Cart = () => {
     handleGetCart();
   }, []);
 
+  const formatCurrency = (amount, currency = 'INR') =>
+    `${currency === 'INR' ? '₹' : currency + ' '}${Number(amount).toLocaleString('en-IN')}`;
+
   const subtotal = cartItems.reduce((acc, item) => acc + item.price.amount * item.quantity, 0);
   const shipping = subtotal > 0 ? 50 : 0;
   const total = subtotal + shipping;
@@ -110,6 +113,9 @@ const Cart = () => {
                 const attributes = variantData.attributes || {};
                 const imageUrl = variantData.images?.[0]?.url || product.images?.[0]?.url || 'https://via.placeholder.com/150';
                 
+                const displayPrice = item.price || { amount: 0, currency: 'INR' };
+                const variantPrice = variantData.price || product.price || { amount: 0, currency: 'INR' };
+
                 return (
                   <div
                     key={item._id}
@@ -159,6 +165,16 @@ const Cart = () => {
                             </span>
                           )}
                         </div>
+
+                        {displayPrice.amount !== variantPrice.amount && (
+                          <div className="mb-2">
+                            {displayPrice.amount > variantPrice.amount
+                                ? <p className="text-[10px] uppercase tracking-[0.15em] text-green-400 font-bold" > you will get this at {formatCurrency(variantPrice.amount, variantPrice.currency)} save ₹{Math.abs(variantPrice.amount - displayPrice.amount)}.  </p>
+                                : <p className="text-[10px] uppercase tracking-[0.15em] text-red-400 font-bold" > Warning this product will cost you ₹{Math.abs(variantPrice.amount - displayPrice.amount)} more.  </p>
+                            }
+                          </div>
+                        )}
+                        
                       </div>
 
                       <div className="flex justify-between items-end">
