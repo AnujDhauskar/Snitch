@@ -72,19 +72,89 @@ export const addToCart = async (req,res)=> {
  
 export const getCart = async(req,res) => {
     try {
-        let cart = await cartModel.findOne({ user : req.user._id }).populate("items.product");
-
-        if(!cart){
-            cart = await cartModel.create({user:req.user._id});
+        let cart = await cartModel.findOne({ user: req.user._id });
+        if (!cart) {
+            cart = await cartModel.create({ user: req.user._id });
+            return res.status(200).json({
+                success: true,
+                message: "Cart fetched successfully",
+                cart: { ...cart.toObject(), totalPrice: 0, items: [] }
+            });
         }
 
-        return res.status(200).json(
+        if (cart.items.length === 0) {
+            return res.status(200).json({
+                success: true,
+                message: "Cart fetched successfully",
+                cart: { ...cart.toObject(), totalPrice: 0, items: [] }
+            });
+        }
+
+        const cartAgg = await cartModel.aggregate([
             {
-                message:"Cart fetched successfully",
-                success:true, 
-                cart
+                $match: {
+                    user: cart.user // using ObjectId from the found document
+                }
+            },
+            { $unwind: { path: '$items' } },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'items.product',
+                    foreignField: '_id',
+                    as: 'items.product'
+                }
+            },
+            { $unwind: { path: '$items.product' } },
+            {
+                $addFields: {
+                    "matchedVariant": {
+                        $first: {
+                            $filter: {
+                                input: "$items.product.varients",
+                                as: "v",
+                                cond: { $eq: ["$$v._id", "$items.variant"] }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    itemPrice: {
+                        price: {
+                            $multiply: [
+                                '$items.quantity',
+                                '$matchedVariant.price.amount'
+                            ]
+                        },
+                        currency: '$matchedVariant.price.currency'
+                    }
+                }
+            },
+            {
+                $project: {
+                    "matchedVariant": 0
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    user: { $first: '$user' },
+                    totalPrice: { $sum: '$itemPrice.price' },
+                    currency: {
+                        $first: '$itemPrice.currency'
+                    },
+                    items: { $push: '$items' }
+                }
             }
-        )
+        ]);
+
+        return res.status(200).json({
+            message: "Cart fetched successfully",
+            success: true, 
+            cart: cartAgg.length > 0 ? cartAgg[0] : { ...cart.toObject(), totalPrice: 0, items: [] }
+        });
     } catch (error) {
         console.error("Error in getCart:", error);
         return res.status(500).json({ success: false, message: error.message, error: error.toString() });
