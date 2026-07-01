@@ -24,3 +24,8 @@ export const updateQuantity = async({productId, varientId, quantity})=>{
     const response = await cartApiInstance.put(`/update/${productId}/${varientId}`, {quantity});
     return response.data;
 }
+
+export const createCartOrder = async () => {
+const response = await cartApiInstance.post("/payment/create/order")
+return response.data
+}

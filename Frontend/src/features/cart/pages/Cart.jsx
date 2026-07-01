@@ -2,11 +2,14 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hook/useCart';
+import { useRazorpay, RazorpayOrderOptions } from "react-razorpay";
 
 const Cart = () => {
   const cartItems = useSelector(state => state.cart.items);
-  const { handleGetCart, handleRemoveItem, handleUpdateQuantity } = useCart();
+  const { handleGetCart, handleRemoveItem, handleUpdateQuantity,handleCreateCartOrder } = useCart();
   const navigate = useNavigate();
+  const { error,isLoading,Razorpay } = useRazorpay();
+  const user = useSelector(state => state.user);
 
   useEffect(() => {
     handleGetCart();
@@ -18,6 +21,34 @@ const Cart = () => {
   const subtotal = cartItems.reduce((acc, item) => acc + item.price.amount * item.quantity, 0);
   const shipping = subtotal > 0 ? 50 : 0;
   const total = subtotal + shipping;
+
+  async function handleCheckOut(){
+      const order = await handleCreateCartOrder();
+      console.log(order);
+       const options = {
+      key: "rzp_test_T87nFugC5BI9rY",
+      amount: order.amount, // Amount in paise
+      currency: order.currency,
+      name: "Snitch",
+      description: "Test Transaction",
+      order_id: order.id, // Generate order_id on server
+      handler: (response) => {
+        console.log(response);
+        alert("Payment Successful!");
+      },
+      prefill: {
+        name: user?.fullname,
+        email: user?.email,
+        contact: user?.contact,
+      },
+      theme: {
+        color:"#8B5CF6",
+      },
+    };
+
+    const razorpayInstance = new Razorpay(options);
+    razorpayInstance.open();
+  }
 
   return (
     <div className="min-h-screen font-sans" style={{ background: '#09090B', color: '#E5E1E4' }}>
@@ -262,6 +293,7 @@ const Cart = () => {
                   }}
                   onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(135deg, #7C3AED, #6D28D9)'; e.currentTarget.style.boxShadow = '0 0 40px rgba(139,92,246,0.5)'; }}
                   onMouseLeave={e => { e.currentTarget.style.background = 'linear-gradient(135deg, #8B5CF6, #7C3AED)'; e.currentTarget.style.boxShadow = '0 0 30px rgba(139,92,246,0.3)'; }}
+                  onClick={handleCheckOut}
                 >
                   Proceed to Checkout
                   <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
