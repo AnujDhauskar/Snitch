@@ -2,6 +2,10 @@ import cartModel from "../models/cart.model.js";
 import productModel from "../models/product.model.js";
 import { stockOfVarient } from "../dao/product.dao.js";
 import { createOrder } from "../services/payment.service.js";
+import { getCartDetails } from "../dao/cart.dao.js";
+
+
+
 
 export const addToCart = async (req,res)=> {
     const { productId, varientId } = req.params
@@ -91,70 +95,12 @@ export const getCart = async(req,res) => {
             });
         }
 
-        const cartAgg = await cartModel.aggregate([
-            {
-                $match: {
-                    user: cart.user // using ObjectId from the found document
-                }
-            },
-            { $unwind: { path: '$items' } },
-            {
-                $lookup: {
-                    from: 'products',
-                    localField: 'items.product',
-                    foreignField: '_id',
-                    as: 'items.product'
-                }
-            },
-            { $unwind: { path: '$items.product' } },
-            {
-                $addFields: {
-                    "matchedVariant": {
-                        $first: {
-                            $filter: {
-                                input: "$items.product.varients",
-                                as: "v",
-                                cond: { $eq: ["$$v._id", "$items.variant"] }
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                $addFields: {
-                    itemPrice: {
-                        price: {
-                            $multiply: [
-                                '$items.quantity',
-                                '$matchedVariant.price.amount'
-                            ]
-                        },
-                        currency: '$matchedVariant.price.currency'
-                    }
-                }
-            },
-            {
-                $project: {
-                    "matchedVariant": 0
-                }
-            },
-            {
-                $group: {
-                    _id: '$_id',
-                    user: { $first: '$user' },
-                    totalPrice: { $sum: '$itemPrice.price' },
-                    currency: {
-                        $first: '$itemPrice.currency'
-                    },
-                    items: { $push: '$items' }
-                }
-            }
-        ]);
+        const cartDetails = await getCartDetails(req.user._id);
 
         return res.status(200).json({
             message: "Cart fetched successfully",
             success: true, 
-            cart: cartAgg.length > 0 ? cartAgg[0] : { ...cart.toObject(), totalPrice: 0, items: [] }
+            cart: cartDetails.length > 0 ? cartDetails[0] : { ...cart.toObject(), totalPrice: 0, items: [] }
         });
     } catch (error) {
         console.error("Error in getCart:", error);
@@ -220,10 +166,19 @@ export const updateCartItemQuantity = async (req, res) => {
 };
 
 export const createOrderController = async (req,res) =>{
-   const order = await createOrder({amount:1000,currency:"INR"})
+
+    const cartDetails = await getCartDetails(req.user._id);
+    if(!cartDetails || cartDetails.length === 0){
+        return res.status(400).json({
+            message:"Cart is Empty",
+            success:false
+        })
+    }
+   const cart = cartDetails[0];
+   const order = await createOrder({amount:cart.totalPrice,currency:cart.currency})
 
    return res.status(200).json({
-    message:"oredr created successfully",
+    message:"order created successfully",
     success:true,
     order
    })
