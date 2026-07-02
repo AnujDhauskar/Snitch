@@ -8,6 +8,7 @@ import Home from "../features/products/pages/Home";
 import ProductDetaile from "../features/products/pages/ProductDetaile";
 import SellerProductDetails from "../features/products/pages/SellerProductDetails";
 import Cart from "../features/cart/pages/Cart";
+import OrderSuccess from "../features/cart/pages/OrderSuccess";
 
 export const routes = createBrowserRouter([
     {
@@ -30,6 +31,12 @@ export const routes = createBrowserRouter([
         path:"/cart",
         element:<Protected>
             <Cart/>
+        </Protected>
+    },
+    {
+        path:"/order-success",
+        element:<Protected>
+            <OrderSuccess/>
         </Protected>
     },
     {
