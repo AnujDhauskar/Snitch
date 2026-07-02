@@ -6,7 +6,7 @@ import { useRazorpay, RazorpayOrderOptions } from "react-razorpay";
 
 const Cart = () => {
   const cartItems = useSelector(state => state.cart.items);
-  const { handleGetCart, handleRemoveItem, handleUpdateQuantity,handleCreateCartOrder } = useCart();
+  const { handleGetCart, handleRemoveItem, handleUpdateQuantity,handleCreateCartOrder,handleVerifyCartOrder } = useCart();
   const navigate = useNavigate();
   const { error,isLoading,Razorpay } = useRazorpay();
   const user = useSelector(state => state.user);
@@ -32,9 +32,11 @@ const Cart = () => {
       name: "Snitch",
       description: "Test Transaction",
       order_id: order.id, // Generate order_id on server
-      handler: (response) => {
-        console.log(response);
-        alert("Payment Successful!");
+      handler: async(response) => {
+        const isValid = await handleVerifyCartOrder(response)
+        if(isValid){
+            navigate(`/order-success?order_id=${response?.razorpay_order_id}`)
+        }
       },
       prefill: {
         name: user?.fullname,

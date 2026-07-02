@@ -29,3 +29,8 @@ export const createCartOrder = async () => {
 const response = await cartApiInstance.post("/payment/create/order")
 return response.data
 }
+
+export const verifyCartOrder = async (data) => {
+const response = await cartApiInstance.post("/payment/verify/order", data,{withCredentials:true})
+return response.data
+}

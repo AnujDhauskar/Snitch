@@ -1,7 +1,7 @@
 import express from 'express';
 import {authenticateUser} from "../middlewares/auth.midleware.js";
 import { validateAddToCart } from '../validators/cart.validator.js';
-import { addToCart,createOrderController,getCart, removeItemFromCart, updateCartItemQuantity } from '../controllers/cart.controller.js';
+import { addToCart,createOrderController,getCart, removeItemFromCart, updateCartItemQuantity, verifyOrderController } from '../controllers/cart.controller.js';
 
 const CartRouter = express.Router();    
 
@@ -42,5 +42,12 @@ CartRouter.put('/update/:productId/:varientId', authenticateUser, updateCartItem
  * @access Private
  */
 CartRouter.post("/payment/create/order",authenticateUser, createOrderController);
+
+/**
+ * @route POST /api/payment/verify
+ * @description Verify payment
+ * @access Private
+ */
+CartRouter.post("/payment/verify/order",authenticateUser, verifyOrderController)
 
 export default CartRouter;
